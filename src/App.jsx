@@ -139,22 +139,22 @@ function App() {
                         <h2 className="text-4xl font-bold mb-8 text-indigo-600 flex items-center justify-center"><i className="fa-solid fa-lightbulb mr-4 text-teal-500"></i>Featured Projects</h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                             <div className="bg-white rounded-xl p-6 group hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 border border-gray-200/60">
-                                <h3 className="text-2xl font-bold mb-2 text-gray-800">KK Computers</h3>
-                                <p className="text-gray-600 mb-4">A modern e-commerce platform for computer hardware and accessories.</p>
+                                <h3 className="text-2xl font-bold mb-2 text-gray-800">Currency Converter</h3>
+                                <p className="text-gray-600 mb-4">A currency converter application built with React.js and Tailwind CSS.</p>
                                 <div className="mb-4 flex flex-wrap gap-2">
                                     <span className="inline-block bg-gray-100 rounded-full px-3 py-1 text-sm font-semibold text-gray-700">React.js</span>
                                     <span className="inline-block bg-gray-100 rounded-full px-3 py-1 text-sm font-semibold text-gray-700">Tailwind CSS</span>
                                 </div>
-                                <a href="https://kk-computers.netlify.app/" target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:text-indigo-800 font-semibold group-hover:underline">View Live Demo <i className="fa-solid fa-arrow-right-long ml-1 transition-transform group-hover:translate-x-1"></i></a>
+                                <a href="https://exchange-rateconverter.netlify.app/" target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:text-indigo-800 font-semibold group-hover:underline">View Live Demo <i className="fa-solid fa-arrow-right-long ml-1 transition-transform group-hover:translate-x-1"></i></a>
                             </div>
                             <div className="bg-white rounded-xl p-6 group hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 border border-gray-200/60">
-                                <h3 className="text-2xl font-bold mb-2 text-gray-800">StreamFlix</h3>
-                                <p className="text-gray-600 mb-4">A Netflix-inspired streaming platform with modern UI and seamless user experience.</p>
+                                <h3 className="text-2xl font-bold mb-2 text-gray-800">Catch Pokemon</h3>
+                                <p className="text-gray-600 mb-4">A Pokemon catching game built with React.js and Tailwind CSS.</p>
                                 <div className="mb-4 flex flex-wrap gap-2">
                                     <span className="inline-block bg-gray-100 rounded-full px-3 py-1 text-sm font-semibold text-gray-700">React.js</span>
                                     <span className="inline-block bg-gray-100 rounded-full px-3 py-1 text-sm font-semibold text-gray-700">API Integration</span>
                                 </div>
-                                <a href="https://streamflix-12.netlify.app/" target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:text-indigo-800 font-semibold group-hover:underline">View Live Demo <i className="fa-solid fa-arrow-right-long ml-1 transition-transform group-hover:translate-x-1"></i></a>
+                                <a href="https://catch-pokemon12.netlify.app/" target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:text-indigo-800 font-semibold group-hover:underline">View Live Demo <i className="fa-solid fa-arrow-right-long ml-1 transition-transform group-hover:translate-x-1"></i></a>
                             </div>
                         </div>
                     </section>
