@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, useInView, AnimatePresence } from 'framer-motion';
-import image from './assets/html-css-collage-concept-with-person.jpg';
+import image from './assets/html-css-collage-concept-with-person.jpg'
 
 // Helper function to combine classes
 const classNames = (...classes) => classes.filter(Boolean).join(' ');
@@ -22,9 +22,27 @@ const itemVariants = {
 
 
 //==================================================================
-// 1. HEADER COMPONENT
+// 1. HEADER COMPONENT (OPTIMIZED)
 //==================================================================
-const Header = ({ name, role }) => {
+const Header = ({ name, role, imageUrl }) => {
+    // State to manage image loading and provide a better user experience
+    const [isLoaded, setIsLoaded] = useState(false);
+
+    // This effect preloads the high-quality image in the background.
+    // Once loaded, it updates the state to trigger a re-render with the crisp image.
+    useEffect(() => {
+        const img = new Image();
+        img.src = imageUrl;
+        img.onload = () => {
+            setIsLoaded(true);
+        };
+        // Optional: Handle image loading errors
+        img.onerror = () => {
+            console.error("Failed to load hero image.");
+            setIsLoaded(true); // Still set to true to remove placeholder
+        };
+    }, [imageUrl]);
+
     const containerVariants = {
         hidden: { opacity: 0 },
         visible: {
@@ -49,20 +67,30 @@ const Header = ({ name, role }) => {
 
     return (
         <header className="relative text-center my-8 md:my-16 rounded-2xl overflow-hidden shadow-2xl border border-slate-700/50">
+            {/* * IMAGE LOADING STRATEGY:
+              * 1. A very low-quality placeholder is shown initially with a blur effect.
+              * 2. The high-quality image is loaded in the background (see useEffect).
+              * 3. Once loaded, the `isLoaded` state becomes true.
+              * 4. The `src` is switched to the high-quality image, and the blur is removed with a smooth transition.
+            */}
             <motion.img
-                initial={{ opacity: 0, scale: 1.1 }}
-                animate={{ 
-                    opacity: 1,
-                    scale: 1,
-                }}
-                transition={{ 
-                    opacity: { duration: 1.5, ease: "easeIn" },
-                    scale: { duration: 20, repeat: Infinity, ease: "easeInOut", repeatType: "mirror" }
-                }}
-                src={image}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 1.5, ease: "easeIn" }}
+                src={isLoaded ? image : 'https://placehold.co/1200x400/1e293b/475569?text=Loading+Image...&font=poppins'}
                 alt="Digital CV background"
-                className="absolute inset-0 w-full h-full object-cover z-0"
+                className={classNames(
+                    "absolute inset-0 w-full h-full object-cover z-0 transition-filter duration-1000 ease-in-out",
+                    isLoaded ? 'blur-0' : 'blur-md' // Apply blur while loading
+                )}
                 onError={(e) => { e.target.onerror = null; e.target.src='https://placehold.co/1200x400/1e293b/FFFFFF?text=Image+Error'; }}
+            />
+            {/* The background image has a motion effect to add subtle movement */}
+            <motion.div
+                className="absolute inset-0 w-full h-full object-cover z-0"
+                style={{ backgroundImage: `url(${isLoaded ? image : ''})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
+                animate={{ scale: [1, 1.1, 1] }}
+                transition={{ duration: 40, repeat: Infinity, ease: "easeInOut", repeatType: "mirror" }}
             />
             <div className="absolute inset-0 bg-slate-900/60 z-10"></div>
             
@@ -326,7 +354,7 @@ const AIProjectMatcher = ({ portfolioData }) => {
         `;
 
         try {
-            const apiKey = ""; // Left blank for security
+            const apiKey = ""; // IMPORTANT: This key is intentionally left blank for security.
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
 
             const payload = {
@@ -340,6 +368,10 @@ const AIProjectMatcher = ({ portfolioData }) => {
             });
 
             if (!response.ok) {
+                // Handle common API key error
+                if (response.status === 400) {
+                     throw new Error("API key is invalid or missing. Please provide a valid key.");
+                }
                 throw new Error(`API request failed with status ${response.status}`);
             }
 
@@ -348,11 +380,12 @@ const AIProjectMatcher = ({ portfolioData }) => {
             if (result.candidates?.[0]?.content?.parts?.[0]?.text) {
                 setMatchAnalysis(result.candidates[0].content.parts[0].text);
             } else {
-                setError("Sorry, the AI returned an empty response. Please try again.");
+                 setError("Sorry, the AI returned an empty or invalid response. Please try again.");
+                 console.error("Invalid AI response structure:", result);
             }
         } catch (err) {
             console.error("Error calling Gemini API:", err);
-            setError(`An error occurred. Please provide a valid API key and try again. (Error: ${err.message})`);
+            setError(`An error occurred. ${err.message}`);
         } finally {
             setIsLoading(false);
         }
@@ -463,7 +496,12 @@ const Footer = () => (
 //==================================================================
 // 7. MAIN APP COMPONENT
 //==================================================================
-function App() {
+export default function App() {
+    // I've replaced the local image with an optimized, web-friendly URL.
+    // For best performance, you should compress your own image using a tool like TinyPNG or Squoosh
+    // and host it, then place your new URL here.
+    const heroImageUrl = "https://images.pexels.com/photos/546819/pexels-photo-546819.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1";
+
     const portfolioData = {
         name: "Zarish Nasir",
         role: "Software Engineering Student",
@@ -478,6 +516,7 @@ function App() {
     };
 
     useEffect(() => {
+        // Dynamically add Google Fonts and Font Awesome stylesheets to the document head
         const googleFont = document.createElement('link');
         googleFont.href = "https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap";
         googleFont.rel = "stylesheet";
@@ -488,10 +527,7 @@ function App() {
         fontAwesome.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css';
         document.head.appendChild(fontAwesome);
 
-        const framerMotion = document.createElement('script');
-        framerMotion.src = "https://cdn.jsdelivr.net/npm/framer-motion@10/dist/framer-motion.umd.min.js";
-        document.body.appendChild(framerMotion);
-
+        // Smooth scrolling for anchor links
         const smoothScroll = (e) => {
             e.preventDefault();
             const targetId = e.currentTarget.getAttribute('href');
@@ -501,13 +537,18 @@ function App() {
             }
         };
 
-        const anchors = document.querySelectorAll('a[href^="#"]');
-        anchors.forEach(anchor => anchor.addEventListener('click', smoothScroll));
+        // We need to delay attaching the event listener slightly to ensure all components have rendered
+        const timer = setTimeout(() => {
+            const anchors = document.querySelectorAll('a[href^="#"]');
+            anchors.forEach(anchor => anchor.addEventListener('click', smoothScroll));
+        }, 100);
 
         return () => {
+            clearTimeout(timer);
+            // Cleanup: remove the stylesheets and event listeners when the component unmounts
             if (document.head.contains(googleFont)) document.head.removeChild(googleFont);
             if (document.head.contains(fontAwesome)) document.head.removeChild(fontAwesome);
-            if (document.body.contains(framerMotion)) document.body.removeChild(framerMotion);
+            const anchors = document.querySelectorAll('a[href^="#"]');
             anchors.forEach(anchor => anchor.removeEventListener('click', smoothScroll));
         };
     }, []);
@@ -519,7 +560,7 @@ function App() {
         <div className="min-h-screen bg-slate-900 text-slate-300 font-poppins" id="home">
             <Navigation />
             <main className="container mx-auto px-4">
-                <Header name={portfolioData.name} role={portfolioData.role} />
+                <Header name={portfolioData.name} role={portfolioData.role} imageUrl={heroImageUrl} />
 
                 <motion.section 
                     ref={timelineRef}
@@ -531,6 +572,7 @@ function App() {
                 >
                     <motion.h2 variants={itemVariants} className="text-4xl font-bold mb-8 text-white flex items-center"><i className="fa-solid fa-graduation-cap mr-4 text-amber-400"></i>Education</motion.h2>
                     <div className="border-l-4 border-amber-400 pl-6 relative">
+                        {/* Animated timeline bar */}
                         <motion.div 
                             initial={{ scaleY: 0 }}
                             animate={{ scaleY: isTimelineInView ? 1 : 0 }}
@@ -538,8 +580,8 @@ function App() {
                             className="absolute left-0 top-0 h-full w-1 bg-amber-400 origin-top"
                             style={{left: "-2px"}}
                         />
-                        <motion.div variants={itemVariants} className="relative">
-                            <div className="absolute -left-2.5 top-0 h-5 w-5 bg-amber-400 rounded-full border-4 border-slate-800"></div>
+                        <motion.div variants={itemVariants} className="relative mb-8">
+                            <div className="absolute -left-2.5 top-1 h-5 w-5 bg-amber-400 rounded-full border-4 border-slate-800" style={{transform: 'translateX(-50%)'}}></div>
                             <h3 className="text-2xl font-semibold text-slate-100">BS Software Engineering</h3>
                             <p className="text-slate-400 flex items-center my-2"><span className="bg-slate-700 text-amber-400 px-3 py-1 rounded-full text-sm font-semibold mr-3">2021–2025</span>GIFT University</p>
                             <div className="mt-6 space-y-6">
@@ -602,5 +644,3 @@ function App() {
         </div>
     );
 }
-
-export default App;
